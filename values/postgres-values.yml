@@ -1,0 +1,8 @@
+global:
+  postgresql:
+    auth:
+      username: "postgres"
+      password: "postgres"
+
+auth: 
+  database: "mails_db"

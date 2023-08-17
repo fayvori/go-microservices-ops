@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "email-service.fullname" . }}
+  labels:
+    {{- include "email-service.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    {{- toYaml .Values.service | nindent 4 }}
+  selector:
+    {{- include "email-service.selectorLabels" . | nindent 4 }}

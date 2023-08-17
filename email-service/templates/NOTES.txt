@@ -1,0 +1,5 @@
+Application was successfully installed the list of availiable ports
+
+{{- range $key, $val := .Values.service }}
+- {{ $val.name | indent 2 }} - {{ $val.port }}
+{{- end }}
