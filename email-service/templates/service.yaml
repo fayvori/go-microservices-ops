@@ -1,3 +1,7 @@
+{{- $grpcGatewayPort := .Values.ports.grpcGatewayPort -}}
+{{- $grpcPort := .Values.ports.grpcPort -}}
+{{- $metricsAndHealthPort := .Values.ports.metricsAndHealthPort -}}
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,6 +11,19 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    {{- toYaml .Values.service | nindent 4 }}
+    - port: {{ $grpcGatewayPort }}
+      targetPort: {{ $grpcGatewayPort }}
+      protocol: TCP
+      name: grpc-gateway
+  
+    - port: {{ $grpcPort }}
+      targetPort: {{ $grpcPort }}
+      protocol: TCP
+      name: grpc
+
+    - port: {{ $metricsAndHealthPort }}
+      targetPort: {{ $metricsAndHealthPort }}
+      protocol: TCP
+      name: metrics
   selector:
     {{- include "email-service.selectorLabels" . | nindent 4 }}

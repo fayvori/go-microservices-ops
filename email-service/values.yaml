@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: fayvori/mail-service
   pullPolicy: IfNotPresent
-  tag: "1.0"
+  tag: "1.1"
 
 imagePullSecrets: []
 nameOverride: ''
@@ -35,59 +35,43 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# Value from vault
-env:
-- name: CONFIG
-  valueFrom:
-    secretKeyRef:
-      name: mail-secret-config
-      key: CONFIG
-
-deploymentPorts:
-  - name: grpc-gateway
-    containerPort: 8192
-    protocol: TCP
-
-  - name: grpc
-    containerPort: 50001
-    protocol: TCP
-  
-  - name: metrics
-    containerPort: 8242
-    protocol: TCP
-
-# Ports for service to expose
-service:
-  - port: 8192
-    targetPort: 8192
-    protocol: TCP
-    name: grpc-gateway
-  
-  - port: 50001
-    targetPort: 50001
-    protocol: TCP
-    name: grpc
-
-  - port: 8242
-    targetPort: 8242
-    protocol: TCP
-    name: metrics
+ports:
+  grpcGatewayPort: 8192
+  grpcPort: 50001
+  metricsAndHealthPort: 8242
 
 ingress:
   enabled: false
   className: ''
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
   hosts:
-  - host: chart-example.local
+  - host: fayvoriexample.site
     paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+      - path: /gateway
+        pathType: Prefix
+        port:
+          number: 8192
+
+      - path: /grpc
+        pathType: Prefix 
+        port: 
+          number: 50001 
+
+      - path: /
+        pathType: Prefix 
+        port:
+          number: 8242
+
+  tls: 
+    - secretName: letsencrypt-prod
+      hosts:
+        - fayvoriexample.site
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

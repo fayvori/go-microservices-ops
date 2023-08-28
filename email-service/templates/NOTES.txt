@@ -1,5 +1,13 @@
-Application was successfully installed the list of availiable ports
 
-{{- range $key, $val := .Values.service }}
-- {{ $val.name | indent 2 }} - {{ $val.port }}
-{{- end }}
+** Please be patient while chart is being deployed **
+
+
+- "gRPC-gateway" {{ .Values.ports.grpcGatewayPort }}
+- "gRPC" {{ .Values.ports.grpcPort }}
+- "Metrics and Health check" {{ .Values.ports.metricsAndHealthPort }}
+
+Access {{ .Release.Name }} gRPC-gateway in local browser
+
+    kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }} {{ .Values.ports.grpcGatewayPort }}:{{ .Values.ports.grpcGatewayPort }}
+
+For more info about application endpoints run `make swagger` in dev repo

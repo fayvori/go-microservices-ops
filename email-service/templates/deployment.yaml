@@ -1,3 +1,7 @@
+{{- $grpcGatewayPort := .Values.ports.grpcGatewayPort -}}
+{{- $grpcPort := .Values.ports.grpcPort -}}
+{{- $metricsAndHealthPort := .Values.ports.metricsAndHealthPort -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,11 +38,25 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            {{- toYaml .Values.deploymentPorts | nindent 12 }}
+            - name: grpc-gateway
+              containerPort: {{ $grpcGatewayPort }}
+              protocol: TCP
+
+            - name: grpc
+              containerPort: {{ $grpcPort }}
+              protocol: TCP
+            
+            - name: metrics
+              containerPort: {{ $metricsAndHealthPort }}
+              protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env: 
-            {{- toYaml .Values.env | nindent 12}}
+            - name: CONFIG
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-config
+                  key: CONFIG
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

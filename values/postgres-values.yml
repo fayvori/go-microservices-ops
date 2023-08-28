@@ -3,6 +3,4 @@ global:
     auth:
       username: "postgres"
       password: "postgres"
-
-auth: 
-  database: "mails_db"
+      database: "mails_db"
